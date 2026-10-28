@@ -23,7 +23,7 @@
 <body>
 <main>
   <h1>Teste das 3 direções — Guerreiro e Lobo</h1>
-  <p>Sul gerado no Gemini; norte e leste por edição sobre o sul; oeste é o leste espelhado por código. Tile 32×32, sem suavização.</p>
+  <p>Sul gerado no Gemini; norte e leste por edição sobre o sul; oeste é o leste espelhado por código. Sprites de 64×64 (a 32 px borrava), sem suavização.</p>
 
   <h2>Lado a lado (sul · norte · leste · oeste)</h2>
   <div id="vitrine"></div>
@@ -31,13 +31,14 @@
   <h2>Animação por código</h2>
   <p><kbd>setas</kbd>/<kbd>WASD</kbd> andar · <kbd>espaço</kbd> atacar · <kbd>H</kbd> sofrer dano · <kbd>M</kbd> morrer · <kbd>R</kbd> reviver tudo</p>
   <p>
-    <button data-escala="2">×2</button> <button data-escala="3">×3</button>
+    <button data-escala="2">×1</button> <button data-escala="4">×2</button>
     <button id="atacar">Atacar</button> <button id="dano">Dano</button> <button id="morrer">Morrer</button> <button id="reviver">Reviver</button>
   </p>
   <canvas id="mundo"></canvas>
 </main>
 <script>
-const T = 32, COLS = 14, ROWS = 9;
+// T é o tile lógico em "pixels de 32"; a arte tem ARTE px, então escala 2 = arte ×1.
+const T = 32, ARTE = 64, COLS = 14, ROWS = 9;
 const DIRS = ["sul", "norte", "leste", "oeste"];
 const DELTA = { sul: [0, 1], norte: [0, -1], leste: [1, 0], oeste: [-1, 0] };
 const img = {};
@@ -53,10 +54,10 @@ function desenharSprite(ctx, nome, dir, x, y, s, tinta, alfa = 1) {
   const fonte = img[`${nome}-${dir === "oeste" ? "leste" : dir}`];
   let src = fonte;
   if (tinta) {
-    src = document.createElement("canvas"); src.width = src.height = T;
+    src = document.createElement("canvas"); src.width = src.height = ARTE;
     const c = src.getContext("2d");
     c.drawImage(fonte, 0, 0);
-    c.globalCompositeOperation = "source-atop"; c.fillStyle = tinta; c.fillRect(0, 0, T, T);
+    c.globalCompositeOperation = "source-atop"; c.fillStyle = tinta; c.fillRect(0, 0, ARTE, ARTE);
   }
   ctx.save();
   ctx.imageSmoothingEnabled = false;
@@ -69,13 +70,13 @@ function desenharSprite(ctx, nome, dir, x, y, s, tinta, alfa = 1) {
 
 function vitrine() {
   const caixa = document.getElementById("vitrine");
-  for (const nome of ["guerreiro", "lobo"]) for (const s of [2, 3]) {
+  for (const nome of ["guerreiro", "lobo"]) for (const s of [2, 4]) {
     const linha = document.createElement("div"); linha.className = "linha"; linha.style.marginBottom = "8px";
     for (const d of DIRS) {
       const cel = document.createElement("div");
       const c = document.createElement("canvas"); c.width = c.height = T * s;
       desenharSprite(c.getContext("2d"), nome, d, 0, 0, s);
-      const r = document.createElement("div"); r.className = "rotulo"; r.textContent = `${nome} ${d} ×${s}`;
+      const r = document.createElement("div"); r.className = "rotulo"; r.textContent = `${nome} ${d} ×${s / 2}`;
       cel.append(c, r); linha.append(cel);
     }
     caixa.append(linha);
@@ -84,7 +85,7 @@ function vitrine() {
 
 // ---- mundo ----
 const cv = document.getElementById("mundo"), ctx = cv.getContext("2d");
-let S = 3;
+let S = 2;
 const ents = [
   { nome: "guerreiro", tx: 4, ty: 4, dir: "sul", vida: 1 },
   { nome: "lobo", tx: 9, ty: 4, dir: "oeste", vida: 1, ia: true },
@@ -94,7 +95,7 @@ const numeros = [];
 for (const e of ents) Object.assign(e, { px: e.tx, py: e.ty, de: null, t: 0, ataque: 0, dano: 0, morte: 0, prox: 0 });
 
 function ajustarEscala(s) { S = s; cv.width = COLS * T * S; cv.height = ROWS * T * S; }
-ajustarEscala(3);
+ajustarEscala(2);
 
 function ocupado(x, y, eu) { return ents.some(e => e !== eu && e.morte === 0 && e.tx === x && e.ty === y); }
 function livre(x, y, eu) { return x >= 0 && y >= 0 && x < COLS && y < ROWS && !ocupado(x, y, eu); }

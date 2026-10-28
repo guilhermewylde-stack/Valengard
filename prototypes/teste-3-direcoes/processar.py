@@ -1,4 +1,4 @@
-"""Recorta o magenta das imagens do Gemini e reduz para a grade de 32 px.
+"""Recorta o magenta das imagens do Gemini e reduz para a grade de 64 px.
 
 Uso: python processar.py  (lê ../../assets/inbox, grava sprites/*.png)
 Todas as direções de um personagem usam a mesma escala, para o tamanho não pular.
@@ -10,8 +10,8 @@ import numpy as np
 AQUI = Path(__file__).parent
 INBOX = AQUI / "../../assets/inbox"
 SAIDA = AQUI / "sprites"
-TILE = 32
-CORES = 24  # cores por personagem depois da redução
+TILE = 64
+CORES = 48  # cores por personagem depois da redução
 
 PERSONAGENS = {
     "guerreiro": {"sul": "guerreiro-sul", "norte": "guerreiro-norte", "leste": "guerreiro-leste-v2"},
