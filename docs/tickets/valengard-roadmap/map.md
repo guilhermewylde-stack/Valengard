@@ -1,6 +1,7 @@
 # Mapa: Valengard do MVP ao lançamento
 
 Label: wayfinder:map
+Status: resolved — destino alcançado em [docs/roadmap.md](../../roadmap.md) (2026-10-27); próximo passo: `/to-spec` do Marco 1.
 
 ## Destination
 
