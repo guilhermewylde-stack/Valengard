@@ -7,7 +7,8 @@ import type { SalaMundo } from '../src/sala-mundo.ts';
 let colyseus: ColyseusTestServer;
 
 beforeAll(async () => {
-  colyseus = await boot(criarServidor());
+  // Porta própria: a padrão do boot (2568) bate com servidores de desenvolvimento.
+  colyseus = await boot(criarServidor(), 25670);
 });
 afterAll(() => colyseus.shutdown());
 beforeEach(() => colyseus.cleanup());
