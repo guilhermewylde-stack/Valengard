@@ -39,8 +39,12 @@ O retrato do herói no início da Caçada: equipamento, atributos, suprimentos e
 _Avoid_: Snapshot, loadout
 
 **Retorno**:
-O fim de uma Caçada: acabaram os Suprimentos, a vida ficou crítica, a mochila encheu ou o jogador assumiu o controle.
+O fim de uma Caçada: acabaram os Suprimentos, a vida ficou crítica, a mochila encheu, chegou ao Teto da Caçada ou o jogador assumiu o controle. Leva o herói a Valen, menos quando o jogador assume o controle.
 _Avoid_: Fim da sessão, recall
+
+**Teto da Caçada**:
+A duração máxima de uma Caçada; maior para quem tem VIP.
+_Avoid_: Limite offline, cap
 
 **Tática**:
 As regras simples que o herói segue na Caçada: quando usar poção, quando recuar, quantas poções levar, que alvo priorizar e quando usar magia de área.

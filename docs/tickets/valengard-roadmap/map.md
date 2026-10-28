@@ -40,6 +40,7 @@ Um Mundo só, do Marco 2 até o lançamento.
 - [Pesquisar a stack em 2026](issues/01-stack-2026.md): ADR-0003 vale; Colyseus 0.18, Phaser 4.2, Tauri 2.12, Drizzle 0.45 com `pg`; fixar a origem do webview cedo.
 - [Modelo de simulação do core](issues/03-modelo-simulacao-core.md): tick de 100 ms, função pura `passo`, só inteiros, RNG com semente no estado, lote pula o tempo morto, atualização fecha as Caçadas offline antes ([ADR-0009](../../adr/0009-simulacao-em-ticks-inteiros.md)).
 - [Autoridade cliente↔servidor](issues/04-autoridade-cliente-servidor.md): cliente só manda intenções, previsão só do próprio passo, queda de conexão vira AUTO, o que vale Ouro grava na hora ([ADR-0010](../../adr/0010-cliente-manda-intencoes.md)).
+- [Regras da Caçada offline](issues/06-cacada-offline.md): teto de 12h (24h VIP); AUTO online e offline são a mesma Caçada; reconectar devolve o herói ao mundo ainda em AUTO; Retorno leva a Valen; Diário guarda resumo e recalcula o detalhe.
 - [Pesquisar a distribuição do cliente PC sem custo](issues/02-distribuicao-pc.md): R$ 0 com GitHub Releases + atualizador do Tauri com chave própria + instalador sem assinatura; certificado OV só se o aviso do SmartScreen derrubar a conversão.
 
 ## Not yet specified
@@ -50,7 +51,7 @@ Um Mundo só, do Marco 2 até o lançamento.
 - **Raid (M5)**: agenda, escala, recompensa para quem participa.
 - **BG/PvP (M6)**: formato da BG, pareamento, arena e desafio, o que se ganha.
 - **Android (M7)**: Capacitor, Caçada offline com notificação local, a mesma Conta no PC e no celular.
-- **Monetização (M8)**: provedor de pagamento no PC (cobra por transação, precisa de aprovação), Google Play Billing, ECA Digital, revisão do ADR-0006 ("por ora").
+- **Monetização (M8)**: provedor de pagamento no PC (cobra por transação, precisa de aprovação), Google Play Billing, ECA Digital, revisão do ADR-0006 ("por ora"), o que é a "Caçada extra na fila" do VIP.
 - **Teste fechado (M9)**: como expor o servidor do PC do autor (túnel ou porta), quem convidar, telemetria.
 - **Lançamento (M10)**: nomes que substituem os ⚠, onde hospedar (PC do autor com túnel, plano grátis como Oracle Cloud Always Free, ou VPS ~€5/mês com aprovação), LGPD e termos de uso, página da loja.
 
