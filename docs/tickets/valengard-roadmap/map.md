@@ -42,6 +42,7 @@ Um Mundo só, do Marco 2 até o lançamento.
 - [Autoridade cliente↔servidor](issues/04-autoridade-cliente-servidor.md): cliente só manda intenções, previsão só do próprio passo, queda de conexão vira AUTO, o que vale Ouro grava na hora ([ADR-0010](../../adr/0010-cliente-manda-intencoes.md)).
 - [Regras da Caçada offline](issues/06-cacada-offline.md): teto de 12h (24h VIP); AUTO online e offline são a mesma Caçada; reconectar devolve o herói ao mundo ainda em AUTO; Retorno leva a Valen; Diário guarda resumo e recalcula o detalhe.
 - [Fórmulas de combate e progressão do Marco 1](issues/05-formulas-combate-progressao.md): curva de XP cúbica, Skill por golpes (+25% cada), dano = Skill × ataque; Nível 8 em ~2h, área do 1 ao 10; Retorno por vida crítica leva ~6 s de fuga; monstros atacam no raio de visão.
+- [Economia do Marco 1](issues/07-economia-m1.md): 4 Slots; ~1h compra a primeira peça melhor e ~5h o kit todo; poção leva ~1/3 do bruto; Aprimoramento +4/+5 com chance, falha só gasta Ouro; revenda a 25%.
 - [Pesquisar a distribuição do cliente PC sem custo](issues/02-distribuicao-pc.md): R$ 0 com GitHub Releases + atualizador do Tauri com chave própria + instalador sem assinatura; certificado OV só se o aviso do SmartScreen derrubar a conversão.
 
 ## Not yet specified

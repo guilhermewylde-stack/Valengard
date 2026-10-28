@@ -97,6 +97,10 @@ _Avoid_: Tier, qualidade
 O nível +1 a +5 que o ferreiro dá a um exemplar, a única variação entre itens do mesmo modelo.
 _Avoid_: Refino, upgrade, encantamento
 
+**Troféu**:
+Uma parte de monstro que cai como Saque e só serve para vender ao vendedor (cauda de rato, pele de lobo).
+_Avoid_: Material, junk, drop de venda
+
 **Saque**:
 Os itens e o ouro que os monstros deixam durante uma Caçada.
 _Avoid_: Loot, drop
