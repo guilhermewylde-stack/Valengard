@@ -30,7 +30,7 @@ Um Mundo só, do Marco 2 até o lançamento.
 
 ### Escopo do Marco 1 (fixado no mapeamento)
 
-- Entra: Morte com perda completa (XP do nível e metade do Saque da Caçada); um Suprimento (poção de vida, vendida no vendedor); Tática com 3 regras (beber poção abaixo de X% de vida, voltar abaixo de Y%, quantas poções levar); Nível e Skill Espada; movimento em grade com alvo travado ([ADR-0008](../../adr/0008-movimento-em-grade.md)); sprites do Gemini (quadrados coloridos até o teste das 3 direções); textos em PT-BR e EN-US.
+- Entra: Morte com perda completa (XP do nível e metade do Saque da Caçada); um Suprimento (poção de vida, vendida no vendedor); Tática com 3 regras (beber poção abaixo de X% de vida, voltar abaixo de Y%, quantas poções levar); Nível e Skill Espada; movimento em grade com alvo travado ([ADR-0008](../../adr/0008-movimento-em-grade.md)); sprites do Gemini (pipeline aprovado no teste das 3 direções); textos em PT-BR e EN-US.
 - Fica de fora: Bênção e sacerdotisa, Missões, Depósito, prioridade de alvo, magia de área, outras vocações, Conta com e-mail.
 
 ## Decisions so far
@@ -46,6 +46,7 @@ Um Mundo só, do Marco 2 até o lançamento.
 - [Formato de mapa](issues/10-formato-de-mapa.md): Tiled em JSON, tiles 32×32; um mapa contínuo Valen + área (~100×80, ~30 pontos de nascimento); build converte para o formato do `core` e a versão do mapa entra na versão do `core`; Valen é Zona segura.
 - [Conta de Convidado no PC](issues/08-conta-convidado-pc.md): segredo de 256 bits no cofre do Windows (sobrevive a reinstalar, não a formatar), token de sessão de 24h, 2 vagas de herói, 5 Convidados por IP por dia, e-mail liga a mesma Conta no Marco 3.
 - [Pesquisar a distribuição do cliente PC sem custo](issues/02-distribuicao-pc.md): R$ 0 com GitHub Releases + atualizador do Tauri com chave própria + instalador sem assinatura; certificado OV só se o aviso do SmartScreen derrubar a conversão.
+- [Teste das 3 direções](issues/09-teste-3-direcoes.md): o personagem se mantém; pipeline do ADR-0005 vale, plano B guardado. Edição pelo `@arquivo` no prompt; a pose às vezes muda e o leste pode precisar de nova tentativa.
 
 ## Not yet specified
 

@@ -19,9 +19,13 @@ no jogo; nada de sprites do Tibia/OTClient.
 - **Três poses paradas por personagem** (ADR-0005): sul; norte e leste por *edição* sobre
   a do sul ("repinte mantendo pose, proporção e perspectiva"); oeste = leste espelhado.
   Andar, atacar, dano e morte são animados por código, não por quadros desenhados.
-- **Teste antes de tudo:** o primeiro trabalho de arte é 1 herói nas 3 direções. Se o
-  Gemini não mantiver o personagem igual, o herói ganha uma base de caminhada desenhada à
-  mão (plano B); monstros seguem só com poses paradas.
+  Para editar, cite a imagem do sul no prompt (`@assets/inbox/<nome>-sul.jpg`, `cwd` na
+  raiz do repo) e descreva a pose de corpo inteiro ("full side view facing right, toes
+  pointing right"): sem isso, o leste tende a virar só a cabeça. Aprovado no teste das 3
+  direções (ticket 09).
+- **Teste das 3 direções: passou** (Guerreiro e Lobo, 2026-10-27). O plano B (base de
+  caminhada desenhada à mão para o herói) fica guardado caso um personagem futuro não se
+  mantenha.
 - **Contorno escuro de 1 px** e sombreamento por faixas de cor (sem degradê suave);
   luz vindo de cima à esquerda.
 - **Paleta dessaturada de dark fantasy:** cinzas, verdes de floresta, marrons de couro,
