@@ -56,10 +56,19 @@ _Avoid_: Log, relatório offline, hunt analyzer
 
 **Área de caça**:
 Um lugar do mundo compartilhado com monstros de uma faixa de nível.
+_Avoid_: Zona, mapa, spawn
+
+**Ponto de nascimento**:
+O lugar de uma Área de caça onde um monstro aparece e volta a aparecer depois de morto.
+_Avoid_: Spawn, respawn
+
+**Zona segura**:
+Um lugar onde monstros não entram, ninguém ataca ninguém e o AUTO não liga; no lançamento, Valen.
+_Avoid_: PZ, área protegida
+
 **Cópia pessoal**:
 A versão só do herói de uma Área de caça, sem disputa, onde corre a Caçada desconectada.
 _Avoid_: Instância offline, shadow
-_Avoid_: Zona, mapa, spawn
 
 **Morte**:
 O fim forçado de uma Caçada quando a vida do herói zera: perde parte do XP do nível e metade do saque daquela Caçada.
