@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Fórmulas do Marco 1</title>
+<style>
+:root{--bg:#f6f2ea;--fg:#231d15;--mut:#6f6455;--acc:#9a5b12;--card:#fffdf8;--line:#ddd2bf;--bad:#a3261b;--good:#2f6b2a}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#16130f;--fg:#ebe3d3;--mut:#a89c88;--acc:#d9a54e;--card:#211c16;--line:#3a3128;--bad:#e0675a;--good:#7cbf6e}}
+:root[data-theme="dark"]{--bg:#16130f;--fg:#ebe3d3;--mut:#a89c88;--acc:#d9a54e;--card:#211c16;--line:#3a3128;--bad:#e0675a;--good:#7cbf6e}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font:14px/1.45 system-ui,sans-serif;margin:0;padding:16px}
+main{max-width:1100px;margin:0 auto}
+h1{font-size:20px;margin:0 0 4px}h2{font-size:15px;margin:20px 0 8px;color:var(--acc)}
+.aviso{color:var(--mut);margin:0 0 12px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+fieldset{border:1px solid var(--line);background:var(--card);border-radius:8px;padding:8px 12px;margin:0}
+legend{font-weight:600;padding:0 4px}
+label{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:4px 0}
+label span{flex:1}label small{display:block;color:var(--mut);font-size:11px}
+input,select{width:84px;background:var(--bg);color:var(--fg);border:1px solid var(--line);border-radius:4px;padding:3px 5px;font:inherit}
+.barra{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:12px 0}
+button{background:var(--acc);color:var(--bg);border:0;border-radius:6px;padding:7px 14px;font:inherit;font-weight:600;cursor:pointer}
+.tab{overflow-x:auto;background:var(--card);border:1px solid var(--line);border-radius:8px}
+table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums}
+th,td{padding:4px 8px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+th:first-child,td:first-child{text-align:left}th{color:var(--mut);font-weight:600}
+.diario{font:12px/1.5 ui-monospace,monospace;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:8px 12px;max-height:320px;overflow:auto;white-space:pre}
+.bad{color:var(--bad)}.good{color:var(--good)}
+code{background:var(--card);padding:1px 4px;border-radius:3px}
+</style>
+</head>
+<body><main>
+<h1>Fórmulas do Marco 1</h1>
+<p class="aviso">PROTÓTIPO descartável do ticket 05. Tick de 100 ms, só inteiros, RNG sfc32 (ADR-0009). Mude qualquer número; a simulação roda de novo sozinha. Os nomes dos monstros são provisórios.</p>
+
+<div id="form" class="grid"></div>
+
+<div class="barra">
+  <label style="margin:0">Duração <select id="horas"><option value="1">1h</option><option value="4">4h</option><option value="12">12h</option></select></label>
+  <label style="margin:0">Sementes <input id="seeds" type="number" value="20" min="1" max="100"></label>
+  <button id="rodar">Rodar</button>
+  <button id="reset" style="background:var(--line);color:var(--fg)">Voltar aos padrões</button>
+  <span id="tempo" class="aviso" style="margin:0"></span>
+</div>
+
+<h2>Resultado (média e faixa entre as sementes)</h2>
+<div class="tab"><table id="resumo"></table></div>
+
+<h2>Hora a hora (semente 1)</h2>
+<div class="tab"><table id="horas-t"></table></div>
+
+<h2>Curva de XP</h2>
+<div class="tab"><table id="curva"></table></div>
+
+<h2>Fim do Diário da Caçada (semente 1)</h2>
+<div id="diario" class="diario"></div>
+
+<h2>As fórmulas</h2>
+<div class="tab" style="padding:8px 12px">
+<p><b>Vida máxima</b> = vida base + vida por nível × (Nível − 1)</p>
+<p><b>XP total para o Nível L</b> = ⌊fator × (L³ − 6L² + 17L − 12) / 3⌋ (com fator 50: Nível 2 = 100, 3 = 200, 4 = 400, 5 = 800, 6 = 1500)</p>
+<p><b>Golpes para subir a Skill</b>: Skill 10→11 pede "golpes base"; cada próxima pede ⌊anterior × crescimento / 100⌋. Cada golpe dado conta 1.</p>
+<p><b>Dano máximo do herói</b> = ⌊Skill × ataque × k / 1000⌋ + ⌊Nível / 5⌋, com ataque = ataque da arma + Aprimoramento × ataque por +1</p>
+<p><b>Golpe</b>: sorteia 0..dano máximo e subtrai um sorteio 0..armadura do alvo (mínimo 0). O monstro bate do mesmo jeito, com o ataque dele contra a armadura do herói.</p>
+<p><b>Regeneração</b>: + regen de vida a cada 3 s. <b>Poção</b>: cura fixa, espera de 1 s entre poções.</p>
+<p><b>Tática</b>: bebe poção abaixo de X% de vida; volta abaixo de Y%. <b>Retorno</b> também quando acabam as poções, a mochila enche ou chega ao Teto. No Retorno: vende os itens, compra as poções da próxima Caçada, volta com vida cheia; gasta o "tempo na cidade".</p>
+<p><b>Morte</b>: perde uma % do XP do Nível (sem cair de Nível) e metade do Ouro e dos itens daquela Caçada; volta a Valen.</p>
+</div>
+</main>
+<script>
+const PARAMS = [
+  ['Herói', [
+    ['hpBase','Vida base (Nível 1)',150],
+    ['hpLvl','Vida por Nível',25],
+    ['regen','Regen a cada 3 s',4],
+    ['arm','Armadura',4],
+    ['ritmo','Ritmo de golpe (ticks)',20,'20 ticks = 2 s'],
+  ]],
+  ['Arma e dano', [
+    ['atk','Ataque da arma',12],
+    ['aprim','Aprimoramento (+0 a +5)',0],
+    ['atkAprim','Ataque por +1',2],
+    ['k','k do dano (/1000)',85],
+  ]],
+  ['Progressão', [
+    ['xpFator','Fator da curva de XP',50],
+    ['skBase','Golpes para Skill 10→11',110],
+    ['skCresc','Crescimento por Skill (%)',125],
+    ['perdaXp','Perda na Morte (% do Nível)',30],
+  ]],
+  ['Tática e Suprimentos', [
+    ['tPocao','Beber poção abaixo de (%)',50],
+    ['tVolta','Voltar abaixo de (%)',15],
+    ['pocoes','Poções levadas',20],
+    ['cura','Cura da poção',80],
+    ['preco','Preço da poção (Ouro)',10],
+  ]],
+  ['Caçada', [
+    ['andar','Ticks até achar o próximo monstro',40,'40 = 4 s andando'],
+    ['mochila','Mochila (itens)',20],
+    ['valorItem','Valor de venda de um item',10],
+    ['cidade','Tempo na cidade no Retorno (ticks)',1200,'1200 = 2 min'],
+    ['bando','Chance de um 2º monstro entrar (/10000)',3000,'por encontro'],
+    ['fuga','Fuga na vida crítica (ticks)',60,'monstros seguem batendo; 0 = some na hora'],
+    ['teto','Teto da Caçada (h)',12],
+  ]],
+  ['Monstro A: Rato', [
+    ['aHp','Vida',20],['aAtk','Ataque',8],['aArm','Armadura',1],['aXp','XP',4],
+    ['aOuro','Ouro máximo',4],['aItem','Chance de item (/10000)',500],['aPeso','Peso no nascimento',65],
+  ]],
+  ['Monstro B: Lobo', [
+    ['bHp','Vida',45],['bAtk','Ataque',32],['bArm','Armadura',2],['bXp','XP',13],
+    ['bOuro','Ouro máximo',12],['bItem','Chance de item (/10000)',800],['bPeso','Peso no nascimento',35],
+  ]],
+];
+const DEF = {};
+const form = document.getElementById('form');
+for (const [grupo, campos] of PARAMS) {
+  const fs = document.createElement('fieldset');
+  fs.innerHTML = `<legend>${grupo}</legend>`;
+  for (const [id, rot, def, dica] of campos) {
+    DEF[id] = def;
+    const l = document.createElement('label');
+    l.innerHTML = `<span>${rot}${dica ? `<small>${dica}</small>` : ''}</span><input type="number" id="p_${id}" value="${def}" step="1">`;
+    fs.appendChild(l);
+  }
+  form.appendChild(fs);
+}
+function lerP() {
+  const P = {};
+  for (const id in DEF) P[id] = Math.trunc(Number(document.getElementById('p_' + id).value) || 0);
+  return P;
+}
+
+// ---- RNG sfc32 (inteiros 32 bits) ----
+function sfc32(a, b, c, d) {
+  return function () {
+    a >>>= 0; b >>>= 0; c >>>= 0; d >>>= 0;
+    let t = (a + b) | 0;
+    a = b ^ (b >>> 9);
+    b = (c + (c << 3)) | 0;
+    c = (c << 21) | (c >>> 11);
+    d = (d + 1) | 0;
+    t = (t + d) | 0;
+    c = (c + t) | 0;
+    return t >>> 0;
+  };
+}
+const sorteia = (r, lo, hi) => hi <= lo ? lo : lo + (r() % (hi - lo + 1));
+
+function xpTotal(L, P) {
+  if (L <= 1) return 0;
+  return Math.floor(P.xpFator * (L * L * L - 6 * L * L + 17 * L - 12) / 3);
+}
+function tabelaSkill(P) {
+  const t = [];
+  let g = Math.max(1, P.skBase);
+  for (let s = 10; s < 200; s++) { t[s] = g; g = Math.max(g + 1, Math.floor(g * P.skCresc / 100)); }
+  return t;
+}
+
+function simular(P, seed, horas, comDiario) {
+  const r = sfc32(seed * 2654435761, 0x9e3779b9, 0x85ebca6b, seed + 1);
+  for (let i = 0; i < 15; i++) r();
+  const tSkill = tabelaSkill(P);
+  const mons = [
+    { nome: 'Rato', hp: P.aHp, atk: P.aAtk, arm: P.aArm, xp: P.aXp, ouro: P.aOuro, item: P.aItem, peso: P.aPeso },
+    { nome: 'Lobo', hp: P.bHp, atk: P.bAtk, arm: P.bArm, xp: P.bXp, ouro: P.bOuro, item: P.bItem, peso: P.bPeso },
+  ];
+  const pesoTotal = Math.max(1, mons[0].peso + mons[1].peso);
+  const T = horas * 36000;
+  const diario = [];
+  const log = (tick, txt) => {
+    if (!comDiario) return;
+    const s = Math.floor(tick / 10), h = Math.floor(s / 3600), m = Math.floor(s / 60) % 60, ss = s % 60;
+    diario.push(`${h}:${String(m).padStart(2, '0')}:${String(ss).padStart(2, '0')}  ${txt}`);
+    if (diario.length > 80) diario.shift();
+  };
+  const hpMax = L => P.hpBase + P.hpLvl * (L - 1);
+
+  let L = 1, xp = 0, sk = 10, golpes = 0, hp = hpMax(1);
+  let ouro = 0, abates = 0, mortes = 0, pocUsadas = 0, retornos = { suprimentos: 0, vida: 0, mochila: 0, teto: 0 };
+  let pot = P.pocoes, ouroC = 0, itensC = 0, inicioC = 0;
+  let extra = null, fugindoAte = -1;
+  let ocupadoAte = 0, alvo = null, monHp = 0, proxAchar = P.andar, proxGolpe = 0, proxMon = 0, potCd = 0;
+  const porHora = [];
+
+  function fimDeCacada(tick, motivo) {
+    ouro += ouroC + itensC * P.valorItem - P.pocoes * P.preco;
+    retornos[motivo]++;
+    log(tick, `RETORNO (${motivo}): +${ouroC} Ouro, ${itensC} itens vendidos, ${pot} poções sobrando`);
+    novaCacada(tick);
+  }
+  function novaCacada(tick) {
+    pot = P.pocoes; ouroC = 0; itensC = 0; alvo = null; extra = null; fugindoAte = -1; hp = hpMax(L);
+    ocupadoAte = tick + P.cidade; inicioC = ocupadoAte; proxAchar = ocupadoAte + P.andar;
+  }
+
+  for (let tick = 0; tick < T; tick++) {
+    if (tick % 36000 === 35999) porHora.push({ L, sk, xp, abates, mortes, pocUsadas, ouro });
+    if (tick < ocupadoAte) continue;
+    const max = hpMax(L);
+    if (tick % 30 === 0 && hp < max) hp = Math.min(max, hp + P.regen);
+
+    if (!alvo) {
+      if (extra) {
+        alvo = extra.m; monHp = extra.hp; proxMon = extra.prox; extra = null; proxGolpe = tick;
+      } else if (tick >= proxAchar) {
+        const sorteiaMon = () => (r() % pesoTotal) < mons[0].peso ? mons[0] : mons[1];
+        alvo = sorteiaMon();
+        monHp = alvo.hp; proxGolpe = tick; proxMon = tick + 10;
+        if (r() % 10000 < P.bando) {
+          const m = sorteiaMon();
+          extra = { m, hp: m.hp, prox: tick + 15 };
+          log(tick, `${alvo.nome} e ${m.nome} atacam juntos`);
+        }
+      }
+    } else {
+      if (fugindoAte < 0 && tick >= proxGolpe) {
+        proxGolpe += P.ritmo;
+        const ataque = P.atk + P.aprim * P.atkAprim;
+        const dmax = Math.floor(sk * ataque * P.k / 1000) + Math.floor(L / 5);
+        const dano = Math.max(0, sorteia(r, 0, dmax) - sorteia(r, 0, alvo.arm));
+        monHp -= dano;
+        golpes++;
+        if (golpes >= tSkill[sk]) { golpes = 0; sk++; log(tick, `Skill Espada subiu para ${sk}`); }
+        if (monHp <= 0) {
+          abates++; xp += alvo.xp;
+          const o = sorteia(r, 0, alvo.ouro); ouroC += o;
+          let it = '';
+          if (r() % 10000 < alvo.item) { itensC++; it = ', 1 item'; }
+          log(tick, `${alvo.nome} morreu: +${alvo.xp} XP, +${o} Ouro${it}`);
+          alvo = null; proxAchar = tick + P.andar;
+          while (xp >= xpTotal(L + 1, P)) { L++; log(tick, `SUBIU para o Nível ${L}`); }
+        }
+      }
+      if (alvo && tick >= proxMon) {
+        proxMon += P.ritmo;
+        const dano = Math.max(0, sorteia(r, 0, alvo.atk) - sorteia(r, 0, P.arm));
+        hp -= dano;
+      }
+    }
+    if (extra && tick >= extra.prox) {
+      extra.prox += P.ritmo;
+      hp -= Math.max(0, sorteia(r, 0, extra.m.atk) - sorteia(r, 0, P.arm));
+    }
+
+    if (hp <= 0) {
+      mortes++;
+      const perda = Math.floor((xpTotal(L + 1, P) - xpTotal(L, P)) * P.perdaXp / 100);
+      xp = Math.max(xpTotal(L, P), xp - perda);
+      ouroC = Math.floor(ouroC / 2); itensC = Math.floor(itensC / 2);
+      ouro += ouroC + itensC * P.valorItem - P.pocoes * P.preco;
+      log(tick, `MORTE para ${alvo ? alvo.nome : '?'}: -${perda} XP, metade do Saque perdida`);
+      novaCacada(tick);
+      continue;
+    }
+    if (pot > 0 && hp * 100 < hpMax(L) * P.tPocao && tick >= potCd) {
+      hp = Math.min(hpMax(L), hp + P.cura); pot--; pocUsadas++; potCd = tick + 10;
+    }
+    const emLuta = alvo || extra;
+    if (fugindoAte >= 0) { if (tick >= fugindoAte) fimDeCacada(tick, 'vida'); }
+    else if (hp * 100 < hpMax(L) * P.tVolta) {
+      if (emLuta && P.fuga > 0) { fugindoAte = tick + P.fuga; log(tick, `Vida crítica (${hp}): fugindo`); }
+      else fimDeCacada(tick, 'vida');
+    }
+    else if (emLuta) { /* as outras voltas esperam a luta acabar */ }
+    else if (P.pocoes > 0 && pot === 0) fimDeCacada(tick, 'suprimentos');
+    else if (itensC >= P.mochila) fimDeCacada(tick, 'mochila');
+    else if (tick - inicioC >= P.teto * 36000) fimDeCacada(tick, 'teto');
+  }
+  // Ouro da Caçada ainda aberta conta como se voltasse agora
+  const ouroFinal = ouro + ouroC + itensC * P.valorItem;
+  return { L, sk, xp, abates, mortes, pocUsadas, ouro: ouroFinal, retornos, porHora, diario };
+}
+
+function faixa(arr, f = x => x) {
+  const v = arr.map(f), s = v.reduce((a, b) => a + b, 0);
+  return { media: s / v.length, min: Math.min(...v), max: Math.max(...v) };
+}
+const fmt = n => Number.isInteger(n) ? n.toLocaleString('pt-BR') : n.toLocaleString('pt-BR', { maximumFractionDigits: 1 });
+
+function rodar() {
+  const t0 = performance.now();
+  const P = lerP();
+  const horas = Number(document.getElementById('horas').value);
+  const n = Math.max(1, Math.min(100, Number(document.getElementById('seeds').value) || 1));
+  const rs = [];
+  for (let s = 1; s <= n; s++) rs.push(simular(P, s, horas, s === 1));
+
+  const linhas = [
+    ['Nível final', x => x.L],
+    ['Skill Espada final', x => x.sk],
+    ['XP', x => x.xp],
+    ['XP por hora', x => Math.floor(x.xp / horas)],
+    ['Monstros mortos', x => x.abates],
+    ['Mortes', x => x.mortes],
+    ['Poções usadas', x => x.pocUsadas],
+    ['Ouro líquido (já pagas as poções)', x => x.ouro],
+    ['Ouro por hora', x => Math.floor(x.ouro / horas)],
+    ['Retornos: acabaram as poções', x => x.retornos.suprimentos],
+    ['Retornos: vida crítica', x => x.retornos.vida],
+    ['Retornos: mochila cheia', x => x.retornos.mochila],
+    ['Retornos: Teto', x => x.retornos.teto],
+  ];
+  let h = '<tr><th></th><th>Média</th><th>Mín.</th><th>Máx.</th></tr>';
+  for (const [nome, f] of linhas) {
+    const z = faixa(rs, f);
+    const cls = nome === 'Mortes' && z.media > 0 ? ' class="bad"' : (nome.startsWith('Ouro') && z.media < 0 ? ' class="bad"' : '');
+    h += `<tr${cls}><td>${nome}</td><td>${fmt(z.media)}</td><td>${fmt(z.min)}</td><td>${fmt(z.max)}</td></tr>`;
+  }
+  document.getElementById('resumo').innerHTML = h;
+
+  let hh = '<tr><th>Hora</th><th>Nível</th><th>Skill</th><th>XP</th><th>Mortos</th><th>Mortes</th><th>Poções</th><th>Ouro</th></tr>';
+  rs[0].porHora.forEach((p, i) => {
+    hh += `<tr><td>${i + 1}h</td><td>${p.L}</td><td>${p.sk}</td><td>${fmt(p.xp)}</td><td>${fmt(p.abates)}</td><td>${p.mortes}</td><td>${fmt(p.pocUsadas)}</td><td>${fmt(p.ouro)}</td></tr>`;
+  });
+  document.getElementById('horas-t').innerHTML = hh;
+
+  const xpHora = Math.max(1, faixa(rs, x => x.xp).media / horas);
+  let c = '<tr><th>Nível</th><th>XP total</th><th>XP deste Nível</th><th>Vida máx.</th><th>Tempo ao ritmo médio desta simulação</th></tr>';
+  for (let L = 2; L <= 15; L++) {
+    const tot = xpTotal(L, P), dif = tot - xpTotal(L - 1, P);
+    const min = Math.round(tot / xpHora * 60);
+    c += `<tr><td>${L}</td><td>${fmt(tot)}</td><td>${fmt(dif)}</td><td>${P.hpBase + P.hpLvl * (L - 1)}</td><td>${min < 120 ? min + ' min' : fmt(min / 60) + ' h'}</td></tr>`;
+  }
+  document.getElementById('curva').innerHTML = c;
+  document.getElementById('diario').textContent = rs[0].diario.join('\n');
+  document.getElementById('tempo').textContent = `${n} sementes × ${horas}h em ${Math.round(performance.now() - t0)} ms`;
+}
+
+let espera;
+form.addEventListener('input', () => { clearTimeout(espera); espera = setTimeout(rodar, 300); });
+document.getElementById('horas').addEventListener('change', rodar);
+document.getElementById('rodar').addEventListener('click', rodar);
+document.getElementById('reset').addEventListener('click', () => {
+  for (const id in DEF) document.getElementById('p_' + id).value = DEF[id];
+  rodar();
+});
+rodar();
+</script>
+</body>
+</html>
