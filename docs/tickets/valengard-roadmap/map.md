@@ -39,6 +39,7 @@ Um Mundo só, do Marco 2 até o lançamento.
 
 - [Pesquisar a stack em 2026](issues/01-stack-2026.md): ADR-0003 vale; Colyseus 0.18, Phaser 4.2, Tauri 2.12, Drizzle 0.45 com `pg`; fixar a origem do webview cedo.
 - [Modelo de simulação do core](issues/03-modelo-simulacao-core.md): tick de 100 ms, função pura `passo`, só inteiros, RNG com semente no estado, lote pula o tempo morto, atualização fecha as Caçadas offline antes ([ADR-0009](../../adr/0009-simulacao-em-ticks-inteiros.md)).
+- [Autoridade cliente↔servidor](issues/04-autoridade-cliente-servidor.md): cliente só manda intenções, previsão só do próprio passo, queda de conexão vira AUTO, o que vale Ouro grava na hora ([ADR-0010](../../adr/0010-cliente-manda-intencoes.md)).
 - [Pesquisar a distribuição do cliente PC sem custo](issues/02-distribuicao-pc.md): R$ 0 com GitHub Releases + atualizador do Tauri com chave própria + instalador sem assinatura; certificado OV só se o aviso do SmartScreen derrubar a conversão.
 
 ## Not yet specified

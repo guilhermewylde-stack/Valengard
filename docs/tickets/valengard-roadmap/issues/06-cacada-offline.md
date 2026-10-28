@@ -9,3 +9,5 @@ Blocked by: 03
 Qual o teto de duração da Caçada offline sem VIP, quando ela começa (ao desconectar em AUTO? ao fechar o cliente?), como o relógio do servidor fecha a conta ao reconectar, o que o Diário da Caçada mostra, e como provar com teste que o offline nunca rende menos que o AUTO online na mesma área (ADR-0001).
 
 Contexto do ticket 03 (ADR-0009): uma Caçada offline pode ser fechada em trechos (a cada atualização do jogo), cada um calculado com a sua versão do `core`. O Diário da Caçada precisa juntar os trechos.
+
+Contexto do ticket 04 (ADR-0010): a queda de conexão fora da cidade liga o AUTO; depois de 30 s sem reconectar, o herói passa para Caçada offline. Falta decidir como é essa passagem (mesma Caçada ou outra, o que vira Preparo).
