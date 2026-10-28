@@ -25,13 +25,18 @@ export interface Heroi {
   livreEm: number;
   /** Direção pedida no meio de um passo, cumprida quando ele termina. */
   passoPedido: Direcao | null;
+  /** Passos que faltam de um `andarAte`. */
+  caminho: readonly Direcao[];
 }
 
 /** O que o cliente (ou a Tática) pede; aplicado no próximo tick (ADR-0010). */
-export type Intencao = { tipo: 'andar'; heroi: string; direcao: Direcao };
+export type Intencao =
+  | { tipo: 'andar'; heroi: string; direcao: Direcao }
+  | { tipo: 'andarAte'; heroi: string; x: number; y: number }
+  | { tipo: 'parar'; heroi: string };
 
 /** Chaves de i18n que o core usa como motivo de recusa; o cliente precisa traduzir todas. */
-export const MOTIVOS_RECUSA = ['recusa.bloqueado'] as const;
+export const MOTIVOS_RECUSA = ['recusa.bloqueado', 'recusa.inalcancavel'] as const;
 export type MotivoRecusa = (typeof MOTIVOS_RECUSA)[number];
 
 /** O que aconteceu no tick; alimenta o Diário e as animações. */

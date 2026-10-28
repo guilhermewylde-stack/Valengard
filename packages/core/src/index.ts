@@ -21,3 +21,5 @@ export {
   type MotivoRecusa,
 } from './estado.ts';
 export { DURACAO_PASSO, adicionarHeroi, criarEstado, passo, removerHeroi } from './passo.ts';
+export { acharCaminho } from './caminho.ts';
+export { RAIO_AREA_X, RAIO_AREA_Y, dentroDaArea } from './area.ts';

@@ -8,9 +8,10 @@
     "caiu": "A conexão com o servidor caiu."
   },
   "hud": {
-    "ajuda": "Setas ou WASD para andar"
+    "ajuda": "Setas ou WASD para andar, clique para ir até um lugar, Esc para parar"
   },
   "recusa": {
-    "bloqueado": "O caminho está bloqueado."
+    "bloqueado": "O caminho está bloqueado.",
+    "inalcancavel": "Não há caminho até lá."
   }
 }

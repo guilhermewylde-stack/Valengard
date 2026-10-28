@@ -1,8 +1,9 @@
 import { randomInt } from 'node:crypto';
 import { Room, type Client, type Messages } from '@colyseus/core';
-import { schema, t, MapSchema, type SchemaType } from '@colyseus/schema';
+import { schema, t, MapSchema, StateView, type SchemaType } from '@colyseus/schema';
 import {
   DELTA,
+  dentroDaArea,
   adicionarHeroi,
   criarEstado,
   passo,
@@ -29,7 +30,7 @@ export const HeroiSala = schema(
 
 export const EstadoSala = schema(
   {
-    herois: t.map(HeroiSala),
+    herois: t.map(HeroiSala).view(),
   },
   'EstadoSala',
 );
@@ -54,6 +55,13 @@ export class SalaMundo extends Room<{ state: EstadoSalaT }> {
       if (!ehDirecao(direcao)) return;
       this.fila.push({ tipo: 'andar', heroi: client.sessionId, direcao });
     },
+    andarAte: (client: Client, destino: unknown) => {
+      if (!ehTile(destino)) return;
+      this.fila.push({ tipo: 'andarAte', heroi: client.sessionId, x: destino.x, y: destino.y });
+    },
+    parar: (client: Client) => {
+      this.fila.push({ tipo: 'parar', heroi: client.sessionId });
+    },
   };
 
   onCreate() {
@@ -63,6 +71,7 @@ export class SalaMundo extends Room<{ state: EstadoSalaT }> {
   onJoin(client: Client) {
     const { x, y } = this.mapa.templo;
     this.sim = adicionarHeroi(this.sim, client.sessionId, x, y);
+    client.view = new StateView();
     this.espelhar();
   }
 
@@ -92,6 +101,21 @@ export class SalaMundo extends Room<{ state: EstadoSalaT }> {
         herois.set(h.id, new HeroiSala({ x: h.x, y: h.y, direcao: h.direcao }));
       }
     }
+    this.atualizarAreas();
+  }
+
+  /** Cada cliente só recebe o que está na área de interesse do próprio herói (ADR-0010). */
+  private atualizarAreas() {
+    for (const client of this.clients) {
+      const centro = this.sim.herois[client.sessionId];
+      const view = client.view;
+      if (!centro || !view) continue;
+      this.state.herois.forEach((h, id) => {
+        const visivel = id === client.sessionId || dentroDaArea(centro, h);
+        if (visivel && !view.has(h)) view.add(h);
+        else if (!visivel && view.has(h)) view.remove(h);
+      });
+    }
   }
 
   /** Eventos do tick só para o dono do herói (no Marco 1, quem vê é só ele). */
@@ -106,4 +130,10 @@ export class SalaMundo extends Room<{ state: EstadoSalaT }> {
 
 function ehDirecao(v: unknown): v is Direcao {
   return typeof v === 'string' && Object.hasOwn(DELTA, v);
+}
+
+function ehTile(v: unknown): v is { x: number; y: number } {
+  if (typeof v !== 'object' || v === null) return false;
+  const { x, y } = v as Record<string, unknown>;
+  return Number.isInteger(x) && Number.isInteger(y);
 }

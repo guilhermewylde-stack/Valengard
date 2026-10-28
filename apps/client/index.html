@@ -9,10 +9,14 @@
       #jogo { width: 100%; height: 100%; }
       #status { position: fixed; inset: 0; display: grid; place-items: center; color: #e8dcc0; font: 16px monospace; pointer-events: none; }
       #status:empty { display: none; }
+      #hud { position: fixed; top: 12px; left: 12px; font: 14px monospace; pointer-events: none; }
+      #ajuda { color: #e8dcc0; }
+      #aviso { color: #e0a080; margin-top: 8px; }
     </style>
   </head>
   <body>
     <div id="jogo"></div>
+    <div id="hud"><div id="ajuda"></div><div id="aviso"></div></div>
     <div id="status"></div>
     <script type="module" src="/src/main.ts"></script>
   </body>

@@ -52,12 +52,29 @@ describe('sala do mundo', () => {
     expect(recusas[0]).toBe('recusa.bloqueado');
   });
 
+  it('anda até o tile clicado e para quando pedido', async () => {
+    const sala = await colyseus.createRoom<SalaMundo>('mundo');
+    const cliente = await colyseus.connectTo(sala);
+    const { templo } = mapaDoMundo();
+    const heroi = () => cliente.state.herois.get(cliente.sessionId);
+    cliente.send('andarAte', { x: templo.x + 2, y: templo.y });
+    await ate(() => heroi()?.x === templo.x + 2);
+    cliente.send('andarAte', { x: templo.x - 2, y: templo.y + 3 });
+    await ate(() => heroi()?.x !== templo.x + 2 || heroi()?.y !== templo.y);
+    cliente.send('parar');
+    await new Promise((r) => setTimeout(r, 1200));
+    const parado = { x: heroi()?.x, y: heroi()?.y };
+    expect(parado).not.toEqual({ x: templo.x - 2, y: templo.y + 3 });
+  });
+
   it('ignora intenção malformada sem mudar nada', async () => {
     const sala = await colyseus.createRoom<SalaMundo>('mundo');
     const cliente = await colyseus.connectTo(sala);
     const { templo } = mapaDoMundo();
     cliente.send('andar', { x: 99, y: 99 });
     cliente.send('andar', 'cima');
+    cliente.send('andarAte', { x: 1.5, y: 'a' });
+    cliente.send('andarAte', null);
     await new Promise((r) => setTimeout(r, 300));
     expect(cliente.state.herois.get(cliente.sessionId)).toMatchObject({ x: templo.x, y: templo.y });
   });

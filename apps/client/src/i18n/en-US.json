@@ -8,9 +8,10 @@
     "caiu": "The connection to the server was lost."
   },
   "hud": {
-    "ajuda": "Arrow keys or WASD to walk"
+    "ajuda": "Arrow keys or WASD to walk, click to go somewhere, Esc to stop"
   },
   "recusa": {
-    "bloqueado": "The way is blocked."
+    "bloqueado": "The way is blocked.",
+    "inalcancavel": "There is no way there."
   }
 }

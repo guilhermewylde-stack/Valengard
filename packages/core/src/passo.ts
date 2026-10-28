@@ -1,8 +1,9 @@
-import { DELTA, type Estado, type Evento, type Heroi, type Intencao } from './estado.ts';
+import { acharCaminho } from './caminho.ts';
+import { DELTA, type Direcao, type Estado, type Evento, type Heroi, type Intencao } from './estado.ts';
 import { podeAndar, type MapaCompacto } from './mapa.ts';
 import type { Rng } from './rng.ts';
 
-/** Ticks de 100 ms que um passo leva. Provisório: o ticket 02 do Marco 1 fixa o valor final. */
+/** Ticks de 100 ms que um passo leva (300 ms, o ritmo do protótipo do teste das 3 direções). */
 export const DURACAO_PASSO = 3;
 
 export function criarEstado(semente: Rng): Estado {
@@ -10,7 +11,7 @@ export function criarEstado(semente: Rng): Estado {
 }
 
 export function adicionarHeroi(estado: Estado, id: string, x: number, y: number): Estado {
-  const heroi: Heroi = { id, x, y, direcao: 'sul', livreEm: estado.tick, passoPedido: null };
+  const heroi: Heroi = { id, x, y, direcao: 'sul', livreEm: estado.tick, passoPedido: null, caminho: [] };
   return { ...estado, herois: { ...estado.herois, [id]: heroi } };
 }
 
@@ -34,24 +35,52 @@ export function passo(
   for (const intencao of intencoes) {
     const heroi = herois[intencao.heroi];
     if (!heroi) continue;
-    herois[heroi.id] = { ...heroi, passoPedido: intencao.direcao };
+    herois[heroi.id] = aplicar(heroi, intencao, mapa, eventos);
   }
 
   for (const id of Object.keys(herois).sort()) {
     const heroi = herois[id];
-    if (!heroi?.passoPedido || estado.tick < heroi.livreEm) continue;
-    const direcao = heroi.passoPedido;
-    const [dx, dy] = DELTA[direcao];
-    const x = heroi.x + dx;
-    const y = heroi.y + dy;
-    if (podeAndar(mapa, x, y)) {
-      herois[id] = { ...heroi, x, y, direcao, passoPedido: null, livreEm: estado.tick + DURACAO_PASSO };
-      eventos.push({ tipo: 'passo', heroi: id, x, y, direcao });
-    } else {
-      herois[id] = { ...heroi, direcao, passoPedido: null };
-      eventos.push({ tipo: 'recusa', heroi: id, motivo: 'recusa.bloqueado' });
-    }
+    if (!heroi || estado.tick < heroi.livreEm) continue;
+    const [direcao, ...resto] = heroi.passoPedido ? [heroi.passoPedido] : heroi.caminho;
+    if (!direcao) continue;
+    herois[id] = andar(heroi, direcao, heroi.passoPedido ? [] : resto, estado.tick, mapa, eventos);
   }
 
   return { estado: { ...estado, tick: estado.tick + 1, herois }, eventos };
+}
+
+function aplicar(heroi: Heroi, intencao: Intencao, mapa: MapaCompacto, eventos: Evento[]): Heroi {
+  switch (intencao.tipo) {
+    case 'andar':
+      return { ...heroi, passoPedido: intencao.direcao, caminho: [] };
+    case 'parar':
+      return { ...heroi, passoPedido: null, caminho: [] };
+    case 'andarAte': {
+      const caminho = acharCaminho(mapa, heroi, intencao);
+      if (caminho === null) {
+        eventos.push({ tipo: 'recusa', heroi: heroi.id, motivo: 'recusa.inalcancavel' });
+        return heroi;
+      }
+      return { ...heroi, passoPedido: null, caminho };
+    }
+  }
+}
+
+function andar(
+  heroi: Heroi,
+  direcao: Direcao,
+  resto: readonly Direcao[],
+  tick: number,
+  mapa: MapaCompacto,
+  eventos: Evento[],
+): Heroi {
+  const [dx, dy] = DELTA[direcao];
+  const x = heroi.x + dx;
+  const y = heroi.y + dy;
+  if (!podeAndar(mapa, x, y)) {
+    eventos.push({ tipo: 'recusa', heroi: heroi.id, motivo: 'recusa.bloqueado' });
+    return { ...heroi, direcao, passoPedido: null, caminho: [] };
+  }
+  eventos.push({ tipo: 'passo', heroi: heroi.id, x, y, direcao });
+  return { ...heroi, x, y, direcao, passoPedido: null, caminho: resto, livreEm: tick + DURACAO_PASSO };
 }
