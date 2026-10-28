@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Teste das 3 direções</title>
+<!-- Protótipo descartável (ticket 09, ADR-0005). Texto fixo aqui de propósito: não é código do jogo. -->
+<style>
+  body { margin: 0; background: #17140f; color: #d8cfb8; font: 14px/1.4 system-ui, sans-serif; }
+  main { max-width: 980px; margin: 0 auto; padding: 16px; }
+  h1 { font-size: 18px; color: #d9b45a; margin: 0 0 4px; }
+  h2 { font-size: 15px; color: #d9b45a; margin: 20px 0 8px; }
+  canvas { image-rendering: pixelated; background: #2b3a22; border: 2px solid #5a4423; display: block; }
+  #mundo { max-width: 100%; }
+  .linha { display: flex; gap: 12px; flex-wrap: wrap; align-items: end; }
+  .rotulo { font-size: 12px; text-align: center; opacity: .8; }
+  button { background: #3a2c18; color: #e8d9b0; border: 1px solid #8a6a32; padding: 6px 10px; cursor: pointer; font: inherit; }
+  button:hover { background: #4b3920; }
+  kbd { background: #3a2c18; border: 1px solid #8a6a32; padding: 0 4px; }
+  p { margin: 4px 0; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Teste das 3 direções — Guerreiro e Lobo</h1>
+  <p>Sul gerado no Gemini; norte e leste por edição sobre o sul; oeste é o leste espelhado por código. Tile 32×32, sem suavização.</p>
+
+  <h2>Lado a lado (sul · norte · leste · oeste)</h2>
+  <div id="vitrine"></div>
+
+  <h2>Animação por código</h2>
+  <p><kbd>setas</kbd>/<kbd>WASD</kbd> andar · <kbd>espaço</kbd> atacar · <kbd>H</kbd> sofrer dano · <kbd>M</kbd> morrer · <kbd>R</kbd> reviver tudo</p>
+  <p>
+    <button data-escala="2">×2</button> <button data-escala="3">×3</button>
+    <button id="atacar">Atacar</button> <button id="dano">Dano</button> <button id="morrer">Morrer</button> <button id="reviver">Reviver</button>
+  </p>
+  <canvas id="mundo"></canvas>
+</main>
+<script>
+const T = 32, COLS = 14, ROWS = 9;
+const DIRS = ["sul", "norte", "leste", "oeste"];
+const DELTA = { sul: [0, 1], norte: [0, -1], leste: [1, 0], oeste: [-1, 0] };
+const img = {};
+
+function carregar(nome) {
+  return Promise.all(["sul", "norte", "leste"].map(d => new Promise(ok => {
+    const i = new Image(); i.onload = ok; i.src = `sprites/${nome}-${d}.png`; img[`${nome}-${d}`] = i;
+  })));
+}
+
+// Oeste = leste espelhado. tinta pinta a silhueta (flash de dano).
+function desenharSprite(ctx, nome, dir, x, y, s, tinta, alfa = 1) {
+  const fonte = img[`${nome}-${dir === "oeste" ? "leste" : dir}`];
+  let src = fonte;
+  if (tinta) {
+    src = document.createElement("canvas"); src.width = src.height = T;
+    const c = src.getContext("2d");
+    c.drawImage(fonte, 0, 0);
+    c.globalCompositeOperation = "source-atop"; c.fillStyle = tinta; c.fillRect(0, 0, T, T);
+  }
+  ctx.save();
+  ctx.imageSmoothingEnabled = false;
+  ctx.globalAlpha = alfa;
+  ctx.translate(x, y);
+  if (dir === "oeste") { ctx.translate(T * s, 0); ctx.scale(-1, 1); }
+  ctx.drawImage(src, 0, 0, T * s, T * s);
+  ctx.restore();
+}
+
+function vitrine() {
+  const caixa = document.getElementById("vitrine");
+  for (const nome of ["guerreiro", "lobo"]) for (const s of [2, 3]) {
+    const linha = document.createElement("div"); linha.className = "linha"; linha.style.marginBottom = "8px";
+    for (const d of DIRS) {
+      const cel = document.createElement("div");
+      const c = document.createElement("canvas"); c.width = c.height = T * s;
+      desenharSprite(c.getContext("2d"), nome, d, 0, 0, s);
+      const r = document.createElement("div"); r.className = "rotulo"; r.textContent = `${nome} ${d} ×${s}`;
+      cel.append(c, r); linha.append(cel);
+    }
+    caixa.append(linha);
+  }
+}
+
+// ---- mundo ----
+const cv = document.getElementById("mundo"), ctx = cv.getContext("2d");
+let S = 3;
+const ents = [
+  { nome: "guerreiro", tx: 4, ty: 4, dir: "sul", vida: 1 },
+  { nome: "lobo", tx: 9, ty: 4, dir: "oeste", vida: 1, ia: true },
+];
+const heroi = ents[0];
+const numeros = [];
+for (const e of ents) Object.assign(e, { px: e.tx, py: e.ty, de: null, t: 0, ataque: 0, dano: 0, morte: 0, prox: 0 });
+
+function ajustarEscala(s) { S = s; cv.width = COLS * T * S; cv.height = ROWS * T * S; }
+ajustarEscala(3);
+
+function ocupado(x, y, eu) { return ents.some(e => e !== eu && e.morte === 0 && e.tx === x && e.ty === y); }
+function livre(x, y, eu) { return x >= 0 && y >= 0 && x < COLS && y < ROWS && !ocupado(x, y, eu); }
+
+function andar(e, dir) {
+  if (e.de || e.morte) return;
+  e.dir = dir;
+  const [dx, dy] = DELTA[dir];
+  if (!livre(e.tx + dx, e.ty + dy, e)) return;
+  e.de = [e.tx, e.ty]; e.tx += dx; e.ty += dy; e.t = 0;
+}
+function alvoNaFrente(e) {
+  const [dx, dy] = DELTA[e.dir];
+  return ents.find(o => o !== e && o.morte === 0 && o.tx === e.tx + dx && o.ty === e.ty + dy);
+}
+function atacar(e) {
+  if (e.morte || e.ataque > 0) return;
+  e.ataque = 1;
+  const alvo = alvoNaFrente(e);
+  if (alvo) setTimeout(() => ferir(alvo, 4 + Math.floor(Math.random() * 9)), 120);
+}
+function ferir(e, n) {
+  if (e.morte) return;
+  e.dano = 1; e.vida -= n / 40;
+  numeros.push({ x: e.tx, y: e.ty, n, t: 0 });
+  if (e.vida <= 0) morrer(e);
+}
+function morrer(e) { if (!e.morte) e.morte = 0.0001; }
+function reviver() { for (const e of ents) Object.assign(e, { vida: 1, morte: 0, dano: 0 }); }
+
+const teclas = { ArrowUp: "norte", w: "norte", ArrowDown: "sul", s: "sul", ArrowRight: "leste", d: "leste", ArrowLeft: "oeste", a: "oeste" };
+const segurando = new Set();
+addEventListener("keydown", ev => {
+  const k = ev.key.length === 1 ? ev.key.toLowerCase() : ev.key;
+  if (teclas[k]) { segurando.add(k); ev.preventDefault(); }
+  if (k === " ") { atacar(heroi); ev.preventDefault(); }
+  if (k === "h") ferir(heroi, 6);
+  if (k === "m") morrer(heroi);
+  if (k === "r") reviver();
+});
+addEventListener("keyup", ev => segurando.delete(ev.key.length === 1 ? ev.key.toLowerCase() : ev.key));
+document.querySelectorAll("[data-escala]").forEach(b => b.onclick = () => ajustarEscala(+b.dataset.escala));
+document.getElementById("atacar").onclick = () => atacar(heroi);
+document.getElementById("dano").onclick = () => ferir(heroi, 6);
+document.getElementById("morrer").onclick = () => morrer(heroi);
+document.getElementById("reviver").onclick = reviver;
+
+function iaLobo(l, dt) {
+  if (l.morte || l.de) return;
+  l.prox -= dt; if (l.prox > 0) return;
+  l.prox = 0.45;
+  const dx = heroi.tx - l.tx, dy = heroi.ty - l.ty;
+  if (heroi.morte === 0 && Math.abs(dx) + Math.abs(dy) === 1) {
+    l.dir = dx > 0 ? "leste" : dx < 0 ? "oeste" : dy > 0 ? "sul" : "norte";
+    atacar(l); l.prox = 1.1; return;
+  }
+  if (heroi.morte === 0 && Math.abs(dx) + Math.abs(dy) <= 6) {
+    const pref = Math.abs(dx) > Math.abs(dy) ? [dx > 0 ? "leste" : "oeste", dy > 0 ? "sul" : "norte"] : [dy > 0 ? "sul" : "norte", dx > 0 ? "leste" : "oeste"];
+    for (const d of pref) { const [ax, ay] = DELTA[d]; if (livre(l.tx + ax, l.ty + ay, l)) return andar(l, d); }
+  } else andar(l, DIRS[Math.floor(Math.random() * 4)]);
+}
+
+const PASSO = 0.28; // segundos por tile
+function atualizar(dt) {
+  if (!heroi.de) for (const k of segurando) { if (teclas[k]) { andar(heroi, teclas[k]); break; } }
+  for (const e of ents) {
+    if (e.ia) iaLobo(e, dt);
+    if (e.de) {
+      e.t += dt / PASSO;
+      if (e.t >= 1) { e.de = null; e.px = e.tx; e.py = e.ty; }
+      else { e.px = e.de[0] + (e.tx - e.de[0]) * e.t; e.py = e.de[1] + (e.ty - e.de[1]) * e.t; }
+    }
+    if (e.ataque > 0) e.ataque = Math.max(0, e.ataque - dt / 0.3);
+    if (e.dano > 0) e.dano = Math.max(0, e.dano - dt / 0.35);
+    if (e.morte > 0 && e.morte < 1) e.morte = Math.min(1, e.morte + dt / 0.7);
+  }
+  for (const n of numeros) n.t += dt;
+  while (numeros.length && numeros[0].t > 0.9) numeros.shift();
+}
+
+function chao() {
+  for (let y = 0; y < ROWS; y++) for (let x = 0; x < COLS; x++) {
+    const h = (x * 73856093 ^ y * 19349663) >>> 0;
+    ctx.fillStyle = ["#2f3f25", "#2b3a22", "#33452a"][h % 3];
+    ctx.fillRect(x * T * S, y * T * S, T * S, T * S);
+    ctx.fillStyle = "#3c5230";
+    for (let i = 0; i < 3; i++) ctx.fillRect((x * T + ((h >> (i * 5)) % 30)) * S, (y * T + ((h >> (i * 7 + 3)) % 30)) * S, S, S * 2);
+  }
+}
+
+function desenharEnt(e) {
+  let x = e.px * T, y = e.py * T, rot = 0, alfa = 1, tinta = null;
+  // andar: balanço vertical de 1 px e leve inclinação alternada
+  if (e.de) { const fase = Math.sin(e.t * Math.PI * 2); y -= Math.abs(fase) * 2; rot = fase * 0.06; }
+  // atacar: avanço de 6 px na direção e volta
+  if (e.ataque > 0) { const [dx, dy] = DELTA[e.dir], k = Math.sin((1 - e.ataque) * Math.PI) * 6; x += dx * k; y += dy * k; }
+  // dano: tremida e flash vermelho/branco
+  if (e.dano > 0) { x += Math.round(Math.sin(e.dano * 40) * 1.5); tinta = e.dano > 0.7 ? "#ffffff" : e.dano > 0.35 ? "#c83c32" : null; }
+  // morte: tomba de lado, escurece, vira cadáver
+  if (e.morte > 0) { rot = e.morte * Math.PI / 2 * (e.dir === "oeste" ? -1 : 1); tinta = "rgba(40,30,25,.55)"; alfa = 1 - e.morte * 0.25; }
+  ctx.save();
+  // sombra
+  ctx.fillStyle = "rgba(0,0,0,.3)";
+  ctx.beginPath(); ctx.ellipse((x + T / 2) * S, (y + T - 2) * S, 9 * S, 3 * S, 0, 0, Math.PI * 2); ctx.fill();
+  ctx.translate((x + T / 2) * S, (y + T) * S); ctx.rotate(rot); ctx.translate(-T / 2 * S, -T * S);
+  desenharSprite(ctx, e.nome, e.dir, 0, 0, S, tinta, alfa);
+  ctx.restore();
+  if (e.morte > 0 && e.morte < 1 || e.morte === 0) {
+    // barra de vida
+    ctx.fillStyle = "#000"; ctx.fillRect((x + 4) * S, (y - 4) * S, 24 * S, 3 * S);
+    ctx.fillStyle = e.vida > 0.5 ? "#4caf50" : e.vida > 0.25 ? "#d9b45a" : "#c83c32";
+    ctx.fillRect((x + 5) * S, (y - 3) * S, Math.max(0, 22 * e.vida) * S, 1 * S);
+  }
+}
+
+function desenhar() {
+  chao();
+  [...ents].sort((a, b) => (a.morte > 0) - (b.morte > 0) || a.py - b.py).forEach(desenharEnt);
+  ctx.font = `bold ${7 * S}px monospace`; ctx.textAlign = "center";
+  for (const n of numeros) {
+    ctx.fillStyle = `rgba(230,60,50,${1 - n.t / 0.9})`;
+    ctx.fillText(n.n, (n.x * T + T / 2) * S, (n.y * T - n.t * 14) * S);
+  }
+}
+
+let antes = 0;
+function quadro(t) { const dt = Math.min(0.05, (t - antes) / 1000); antes = t; atualizar(dt); desenhar(); requestAnimationFrame(quadro); }
+Promise.all([carregar("guerreiro"), carregar("lobo")]).then(() => { vitrine(); requestAnimationFrame(t => { antes = t; quadro(t); }); });
+</script>
+</body>
+</html>
