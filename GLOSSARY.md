@@ -39,7 +39,7 @@ O retrato do herói no início da Caçada: equipamento, atributos, suprimentos e
 _Avoid_: Snapshot, loadout
 
 **Retorno**:
-O fim de uma Caçada: acabaram os Suprimentos, a vida ficou crítica, a mochila encheu, chegou ao Teto da Caçada ou o jogador assumiu o controle. Leva o herói a Valen, menos quando o jogador assume o controle.
+O fim de uma Caçada: acabaram os Suprimentos, a vida ficou crítica, a mochila encheu, chegou ao Teto da Caçada ou o jogador assumiu o controle. Leva o herói a Valen, menos quando o jogador assume o controle; por vida crítica, ele antes precisa sair andando da luta.
 _Avoid_: Fim da sessão, recall
 
 **Teto da Caçada**:
