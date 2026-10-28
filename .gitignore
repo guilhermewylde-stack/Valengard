@@ -1,2 +1,8 @@
 # Protótipo antigo (repositório próprio, só leitura, será removido)
 Valengard/
+
+node_modules/
+dist/
+target/
+*.log
+.env

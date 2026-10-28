@@ -1,0 +1,16 @@
+{
+  "jogo": {
+    "titulo": "Valengard"
+  },
+  "conexao": {
+    "conectando": "Connecting to the server…",
+    "falhou": "Could not connect to the server.",
+    "caiu": "The connection to the server was lost."
+  },
+  "hud": {
+    "ajuda": "Arrow keys or WASD to walk"
+  },
+  "recusa": {
+    "bloqueado": "The way is blocked."
+  }
+}

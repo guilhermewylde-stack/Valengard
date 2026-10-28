@@ -1,0 +1,27 @@
+{
+  "name": "valengard",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@11.28.2",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "test": "pnpm -r test",
+    "lint": "eslint .",
+    "typecheck": "pnpm -r typecheck",
+    "mapa": "tsx scripts/construir-mapa.ts",
+    "dev:server": "pnpm --filter @valengard/server dev",
+    "dev:client": "pnpm --filter @valengard/client dev"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^24.0.0",
+    "@valengard/core": "workspace:*",
+    "eslint": "^10.13.0",
+    "tsx": "^4.23.15",
+    "typescript": "~6.0.3",
+    "typescript-eslint": "^8.72.1",
+    "vitest": "^5.0.5"
+  }
+}

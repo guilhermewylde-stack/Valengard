@@ -1,0 +1,16 @@
+{
+  "jogo": {
+    "titulo": "Valengard"
+  },
+  "conexao": {
+    "conectando": "Conectando ao servidor…",
+    "falhou": "Não foi possível conectar ao servidor.",
+    "caiu": "A conexão com o servidor caiu."
+  },
+  "hud": {
+    "ajuda": "Setas ou WASD para andar"
+  },
+  "recusa": {
+    "bloqueado": "O caminho está bloqueado."
+  }
+}
