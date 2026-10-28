@@ -10,7 +10,7 @@ Como distribuir o cliente Tauri no Windows sem custo: assinatura de código (o S
 
 ## Answer
 
-Detalhe: `docs/research/distribuicao-pc.md` no branch `research/distribuicao-pc` (commit b68e9a4, só local: o push para o `origin` não respondeu).
+Detalhe: `docs/research/distribuicao-pc.md` no branch `research/distribuicao-pc` (commit b68e9a4, no GitHub).
 
 - **Caminho de R$ 0**: GitHub Releases (repositório público só de releases, se o código for privado) publicado pelo `tauri-action`; o atualizador do Tauri 2 com chave própria (grátis, independe de Authenticode); instalador NSIS sem assinatura de código; espelho no itch.io para ser descoberto; cada versão enviada à Microsoft para análise de reputação.
 - **Sem assinatura**, o SmartScreen avisa mas deixa instalar. Com o Smart App Control ligado no Windows 11, o instalador é bloqueado. Testar numa VM com ele ligado.
