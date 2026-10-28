@@ -1,0 +1,3 @@
+# O que o Valengard nunca vende
+
+Nunca por dinheiro: equipamento ou atributos, prêmio aleatório pago (loot box), boosts de XP ou Ouro, reviver, chance melhor de Aprimoramento. O que se vende é conveniência e aparência: Pacote do Aventureiro, VIP (teto maior da Caçada, não rendimento maior), Passe da Jornada, Gemas para cosméticos e slots. Motivos: o público Tibia-like rejeita pay-to-win, o ECA Digital proíbe loot box paga para quem pode ser menor, e o protótipo vendia boosts, o que já era pay-to-win disfarçado. No PC não há anúncios; o que no Android vem de anúncio premiado vira missão diária. Decisão provisória ("por ora"), revisitar antes do lançamento.

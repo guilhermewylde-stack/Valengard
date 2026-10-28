@@ -1,0 +1,7 @@
+# Monorepo TypeScript, servidor em tempo real, menus em HTML
+
+pnpm com `packages/core` (simulação pura em ticks, Vitest, usada pelo cliente e pelo servidor), `apps/client` (Vite + Phaser para o mundo, Preact/HTML para os menus; Tauri no PC, Capacitor no Android) e `apps/server` (Node + Colyseus para salas em tempo real, PostgreSQL via Drizzle). Menus em HTML porque um RPG é sobretudo mochila, loja e fichas, e HTML resolve texto, i18n e telas de vários tamanhos melhor que o canvas. PostgreSQL desde o início porque um MMO tem muitas escritas simultâneas.
+
+## Consequences
+
+Desenvolvimento e teste fechado rodam no PC do autor, sem custo. A VPS (~€5/mês) só entra no teste aberto, com aprovação explícita.
