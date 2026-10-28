@@ -12,7 +12,7 @@ Contexto do ticket 05: monstros atacam quem entra no raio de visão deles (~3 ti
 
 ## Answer
 
-- **Editor e formato**: Tiled, salvando JSON (`.tmj`), tileset de 32×32 px (ART-BIBLE). RME/OTBM descartados: dependem de itens e sprites do Tibia.
+- **Editor e formato**: Tiled, salvando JSON (`.tmj`), tileset de 64×64 px (era 32×32; trocado pelo [ADR-0011](../../../adr/0011-arte-em-64-px.md) depois do teste das 3 direções). RME/OTBM descartados: dependem de itens e sprites do Tibia.
 - **Camadas**: chão; decoração (não bloqueia); obstáculos (propriedade `bloqueia` por tile); por cima (copas e telhados desenhados sobre o herói). Objetos: ponto de nascimento (espécie, raio de ~3 tiles por onde anda, renascimento), NPC (vendedor, ferreiro), zona segura (retângulo), templo (onde o herói aparece no Retorno e na Morte).
 - **Um mapa contínuo no Marco 1**: o portão de Valen dá direto na Área de caça. Cada tile marca a região a que pertence, para dividir em salas por região no Marco 2 se a carga pedir.
 - **Tamanho**: Valen ~40×30 tiles (muralha, templo, vendedor, ferreiro); Área de caça ~100×80 com ~30 pontos de nascimento e renascimento de 60 s. Ratos perto do portão (Níveis 1–4), Lobos mais longe (4–10), em grupos de 2–3 pontos para ~1 encontro em 3 ter dois monstros.

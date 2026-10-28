@@ -43,10 +43,10 @@ Um Mundo só, do Marco 2 até o lançamento.
 - [Regras da Caçada offline](issues/06-cacada-offline.md): teto de 12h (24h VIP); AUTO online e offline são a mesma Caçada; reconectar devolve o herói ao mundo ainda em AUTO; Retorno leva a Valen; Diário guarda resumo e recalcula o detalhe.
 - [Fórmulas de combate e progressão do Marco 1](issues/05-formulas-combate-progressao.md): curva de XP cúbica, Skill por golpes (+25% cada), dano = Skill × ataque; Nível 8 em ~2h, área do 1 ao 10; Retorno por vida crítica leva ~6 s de fuga; monstros atacam no raio de visão.
 - [Economia do Marco 1](issues/07-economia-m1.md): 4 Slots; ~1h compra a primeira peça melhor e ~5h o kit todo; poção leva ~1/3 do bruto; Aprimoramento +4/+5 com chance, falha só gasta Ouro; revenda a 25%.
-- [Formato de mapa](issues/10-formato-de-mapa.md): Tiled em JSON, tiles 32×32; um mapa contínuo Valen + área (~100×80, ~30 pontos de nascimento); build converte para o formato do `core` e a versão do mapa entra na versão do `core`; Valen é Zona segura.
+- [Formato de mapa](issues/10-formato-de-mapa.md): Tiled em JSON, tiles 64×64 (ADR-0011); um mapa contínuo Valen + área (~100×80, ~30 pontos de nascimento); build converte para o formato do `core` e a versão do mapa entra na versão do `core`; Valen é Zona segura.
 - [Conta de Convidado no PC](issues/08-conta-convidado-pc.md): segredo de 256 bits no cofre do Windows (sobrevive a reinstalar, não a formatar), token de sessão de 24h, 2 vagas de herói, 5 Convidados por IP por dia, e-mail liga a mesma Conta no Marco 3.
 - [Pesquisar a distribuição do cliente PC sem custo](issues/02-distribuicao-pc.md): R$ 0 com GitHub Releases + atualizador do Tauri com chave própria + instalador sem assinatura; certificado OV só se o aviso do SmartScreen derrubar a conversão.
-- [Teste das 3 direções](issues/09-teste-3-direcoes.md): o personagem se mantém; pipeline do ADR-0005 vale, plano B guardado. Edição pelo `@arquivo` no prompt; a pose às vezes muda e o leste pode precisar de nova tentativa.
+- [Teste das 3 direções](issues/09-teste-3-direcoes.md): o personagem se mantém e o pipeline do ADR-0005 vale, mas em 64 px (a 32 borrava): arte em 64×64 por tile ([ADR-0011](../../adr/0011-arte-em-64-px.md)); plano B guardado; a pose às vezes muda e o leste pode precisar de nova tentativa.
 
 ## Not yet specified
 

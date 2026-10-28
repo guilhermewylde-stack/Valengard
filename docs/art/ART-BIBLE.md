@@ -13,8 +13,9 @@ no jogo; nada de sprites do Tibia/OTClient.
 
 ## O que copiar do estilo
 
-- **Pixel art clássica de MMORPG**, como o Tibia: personagens que cabem em um tile de
-  32×32 px, ampliados por múltiplos inteiros (×2, ×3), sem suavização.
+- **Pixel art clássica de MMORPG**, como o Tibia, mas em **64×64 px por tile**
+  ([ADR-0011](../adr/0011-arte-em-64-px.md)): a 32 px a redução borrava tudo. Ampliação só
+  por múltiplos inteiros (×1, ×2), sem suavização.
 - **Perspectiva 3/4 de cima**, quatro direções (sul, norte, leste, oeste).
 - **Três poses paradas por personagem** (ADR-0005): sul; norte e leste por *edição* sobre
   a do sul ("repinte mantendo pose, proporção e perspectiva"); oeste = leste espelhado.
@@ -23,7 +24,7 @@ no jogo; nada de sprites do Tibia/OTClient.
   raiz do repo) e descreva a pose de corpo inteiro ("full side view facing right, toes
   pointing right"): sem isso, o leste tende a virar só a cabeça. Aprovado no teste das 3
   direções (ticket 09).
-- **Teste das 3 direções: passou** (Guerreiro e Lobo, 2026-10-27). O plano B (base de
+- **Teste das 3 direções: passou em 64 px** (Guerreiro e Lobo, 2026-10-27). O plano B (base de
   caminhada desenhada à mão para o herói) fica guardado caso um personagem futuro não se
   mantenha.
 - **Contorno escuro de 1 px** e sombreamento por faixas de cor (sem degradê suave);
@@ -31,7 +32,7 @@ no jogo; nada de sprites do Tibia/OTClient.
 - **Paleta dessaturada de dark fantasy:** cinzas, verdes de floresta, marrons de couro,
   com um destaque de cor por vocação (azul da magia, dourado do metal).
 - **Retratos** maiores (64×64 ou 96×96) com moldura dourada, para a ficha do herói e os NPCs.
-- **Ícones de item** em 32×32 sobre slot de madeira escura.
+- **Ícones de item** em 64×64 sobre slot de madeira escura.
 - **Interface** em painéis de madeira escura com bordas e títulos dourados.
 
 ## Bloco de estilo para os prompts do Gemini
@@ -40,7 +41,7 @@ Repetir este bloco em todo prompt de `mcp__pool__generate_image`:
 
 ```
 Classic 2D MMORPG pixel art in the style of early-2000s top-down online RPGs.
-3/4 top-down view, character fits a 32x32 pixel tile, crisp pixels, no anti-aliasing,
+3/4 top-down view, character fits a 64x64 pixel tile, crisp pixels, no anti-aliasing,
 1-pixel dark outline, flat cel shading with 3-4 tones per color, light from top-left.
 Muted dark-fantasy palette: stone greys, forest greens, worn leather browns, one accent
 color. Original character design, no existing franchise characters or symbols.
@@ -48,7 +49,9 @@ Solid flat magenta background #FF00FF, no shadow on the background, no text.
 ```
 
 O Gemini devolve JPG 1024×1024. O script de processamento (passo 7 do kickoff) recorta o
-magenta, reduz para a grade de 32 px e prende os pixels à paleta.
+magenta, reduz para a grade de 64 px (mesma escala para todas as direções de um
+personagem), prende os pixels a uma paleta comum e refaz o contorno de 1 px. O
+`processar.py` do branch `prototype/teste-3-direcoes` é o ponto de partida.
 
 ## Arte por código (ideia do Dunloc Online)
 
